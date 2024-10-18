@@ -5,11 +5,11 @@ const dbSetting = {
     databaseURL: "https://crud-js-firebase-9a04b-default-rtdb.asia-southeast1.firebasedatabase.app/",
 };
 
-const app = initializeApp(dbSetting);
+const app = initializeApp(dbSetting); /*Firebase Database Connection*/
 const database = getDatabase(app);
 const userListInDb = ref(database, "users");
 
-const userId = document.querySelector("#id");
+const userId = document.querySelector("#Id");    /*Assign User Details form ID*/
 const userName = document.querySelector("#name");
 const userAge = document.querySelector("#age");
 const userCity = document.querySelector("#city"); 
@@ -19,45 +19,47 @@ const tblBody = document.querySelector("#tblBody");
 frm.addEventListener("submit", event => {
     event.preventDefault();
 
-    if(!userName.value.trim() || !userage.value.trim() || !usercity.value.trim()){
-        window.alert("Please fill the details");
+
+    if(!userName.value.trim() || !userAge.value.trim() || !userCity.value.trim()){ /*Check User Input Details*/
+        window.alert("Please fill in all details");
         return;
     }
 
 
-    if(userId.value){
-        set(ref(database,"users/" + userId.value),{
+    if(userId.value) {           /*Update User Details*/
+        set(ref(database, "users/" + userId.value), {
             name: userName.value.trim(),
             age: userAge.value.trim(),
             city: userCity.value.trim()
         });
-        clearInput();
+        clearInput(); 
         return;
     }
 
-    const newUser = {
+
+    const newUser = {  /*Add new User Details*/
         name: userName.value.trim(),
         age: userAge.value.trim(),
         city: userCity.value.trim()
     };
 
     push(userListInDb, newUser);
-    clearInput();
-})
+    clearInput(); 
+});
 
-function clearInput(){
+function clearInput() { /*Clear INput Details*/
+    userId.value = ""; 
     userName.value = "";
     userAge.value = "";
     userCity.value = "";
 }
 
-onValue(userListInDb, function (data){
+onValue(userListInDb, function (data) { /*Display User Details in Table*/
+    tblBody.innerHTML = ""; 
 
-    tblBody.innerHTML = "";
-
-    if(data.exists()){
+    if(data.exists()) {
         let usersArray = Object.entries(data.val());
-        for(let i = 0; i < usersArray.length; i++){
+        for(let i = 0; i < usersArray.length; i++) {
             let currentUser = usersArray[i];
             let userId = currentUser[0];
             let userData = currentUser[1];
@@ -75,14 +77,13 @@ onValue(userListInDb, function (data){
             </tr>
             `;
         }
-    }
-    else{
+    } else {
         tblBody.innerHTML = "<tr><td colspan='5'>Data Not Found!!</td></tr>";
     }
-})
+});
 
 document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("btn-edit")) {
+    if (e.target.classList.contains("btn-edit")) {  /*Edit User Details*/
         const userId = e.target.dataset.id; 
         const tableRow = e.target.closest("tr").children; 
 
@@ -90,15 +91,12 @@ document.addEventListener("click", function (e) {
         userName.value = tableRow[1].textContent;
         userAge.value = tableRow[2].textContent;
         userCity.value = tableRow[3].textContent;
-    } else if (e.target.classList.contains("btn-delete")) {
+
+    } else if (e.target.classList.contains("btn-delete")) { /*Delete User Details*/
         if (confirm("Are you sure to delete the user?")) {
             const userId = e.target.dataset.id;
             const userRef = ref(database, `users/${userId}`);
-            remove(userRef); 
+            remove(userRef);  
         }
     }
 });
-    
-
-
-   
